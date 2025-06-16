@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+
+<div class="featured-title">
+  <h1>Berita Terbaru</h1>
+</div>
+<div class="article-grid featured-grid">
+  <% if (articlesBlock1.length > 0) { %> <%
+  articlesBlock1.forEach(function(article) { %>
+  <a href="/artikel/<%= article.slug %>" class="article-card">
+    <img
+      src="<%= article.imageUrl %>"
+      alt="<%= article.title %>"
+      class="card-img"
+    />
+    <div class="card-content">
+      <span class="card-category"><%= article.category %></span>
+      <h2 class="card-title"><%= article.title %></h2>
+      <p class="card-text"><%= article.content.substring(0, 100) %>...</p>
+      <small class="card-date"
+        ><%= new Date(article.createdAt).toLocaleDateString('id-ID', { day:
+        'numeric', month: 'long', year: 'numeric' }) %></small
+      >
+    </div>
+  </a>
+  <% }) %> <% } else { %>
+  <p style="text-align: center; grid-column: 1 / -1">Belum ada berita.</p>
+  <% } %>
+</div>
+
+<% if (articlesBlock2.length > 0) { %>
+<hr class="section-divider" />
+<div class="section-title">
+  <h2>Berita Terkini</h2>
+</div>
+<div class="article-list">
+  <% articlesBlock2.forEach(function(article) { %>
+  <a href="/artikel/<%= article.slug %>" class="list-article-card">
+    <div class="list-card-image">
+      <img src="<%= article.imageUrl %>" alt="<%= article.title %>" />
+    </div>
+    <div class="list-card-content">
+      <h3 class="list-card-title"><%= article.title %></h3>
+      <div class="list-card-meta">
+        <span class="card-category"><%= article.category %></span>
+        <span class="card-date"
+          ><%= new Date(article.createdAt).toLocaleDateString('id-ID', { day:
+          'numeric', month: 'long', year: 'numeric' }) %></span
+        >
+      </div>
+    </div>
+  </a>
+  <% }) %>
+</div>
+<% } %> <% if (articlesBlock3.length > 0) { %>
+<hr class="section-divider" />
+<div class="section-title">
+  <h2>Rekomendasi untuk anda</h2>
+</div>
+<div class="article-grid older-grid">
+  <% articlesBlock3.forEach(function(article) { %>
+  <a href="/artikel/<%= article.slug %>" class="article-card">
+    <img
+      src="<%= article.imageUrl %>"
+      alt="<%= article.title %>"
+      class="card-img"
+    />
+    <div class="card-content">
+      <span class="card-category"><%= article.category %></span>
+      <h2 class="card-title"><%= article.title %></h2>
+      <p class="card-text"><%= article.content.substring(0, 100) %>...</p>
+      <small class="card-date"
+        ><%= new Date(article.createdAt).toLocaleDateString('id-ID', { day:
+        'numeric', month: 'long', year: 'numeric' }) %></small
+      >
+    </div>
+  </a>
+  <% }) %>
+</div>
+<% } %> <%- include('partials/footer') %>

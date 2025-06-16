@@ -1,0 +1,51 @@
+<%- include('../partials/admin-header') %>
+
+<div class="admin-wrapper">
+  <%- include('../partials/admin-sidebar') %>
+
+  <div class="admin-main-content">
+    <div class="dashboard">
+      <h2>Daftar Artikel</h2>
+      <div class="table-section">
+        <table>
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Judul</th>
+              <th>Kategori</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (articles.length > 0) { %> <%
+            articles.forEach(function(article, i) { %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><%= article.title %></td>
+              <td><%= article.category %></td>
+              <td class="action-buttons">
+                <a href="/admin/edit/<%= article._id %>" class="btn btn-edit"
+                  >Edit</a
+                >
+                <form
+                  action="/admin/delete/<%= article._id %>?_method=DELETE"
+                  method="POST"
+                  style="display: inline"
+                >
+                  <button type="submit" class="btn btn-delete">Hapus</button>
+                </form>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="4" style="text-align: center">Belum ada artikel.</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/admin-footer') %>

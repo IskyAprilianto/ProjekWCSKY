@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+  <body class="admin-page-body">
+    <header class="admin-header">
+      <div class="container">
+        <a href="/admin/dashboard" class="logo">Dashboard Admin</a>
+        <nav class="admin-header-nav">
+          <a href="/" class="nav-link" target="_blank">Lihat Situs</a>
+          <% if (user) { %>
+          <div class="admin-user-info">
+            <span>Admin: <strong><%= user.username %></strong></span>
+          </div>
+          <form action="/logout" method="POST" style="display: inline">
+            <button type="submit" class="btn-logout">Logout</button>
+          </form>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container"><%- include('./_messages.ejs') %></div>
+
+    <main class="container"></main>
+  </body>
+</html>

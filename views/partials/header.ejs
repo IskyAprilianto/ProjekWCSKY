@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="container header-top">
+        <a href="/" class="logo">SKY.com</a>
+
+        <form action="/search" method="GET" class="search-form">
+          <input
+            id="searchInput"
+            type="search"
+            name="q"
+            placeholder="Cari berita terkini hanya di SKY.com"
+            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+            autocomplete="off"
+          />
+          <button
+            type="button"
+            id="clearSearchBtn"
+            class="search-form-btn clear-btn"
+            title="Hapus"
+          >
+            &times;
+          </button>
+          <button
+            type="submit"
+            id="searchSubmitBtn"
+            class="search-form-btn"
+            title="Cari"
+          >
+            🔍
+          </button>
+        </form>
+
+        <nav class="user-nav">
+          <% if (user) { %> <% if (user.role === 'admin') { %>
+          <a href="/admin/dashboard">Admin</a>
+          <% } %>
+          <span class="welcome-user">Halo, <%= user.username %></span>
+          <form action="/logout" method="POST" style="display: inline">
+            <button type="submit" class="btn-logout">Logout</button>
+          </form>
+          <% } else { %>
+          <a href="/login">Login</a>
+          <% } %>
+        </nav>
+      </div>
+      <div class="header-bottom">
+        <div class="container">
+          <nav class="category-nav">
+            <a
+              href="/"
+              class="<%= typeof currentCategory !== 'undefined' && currentCategory === 'all' ? 'active' : '' %>"
+              >News</a
+            >
+            <% if (typeof categories !== 'undefined' && categories.length > 0) {
+            %> <% categories.forEach(function(category) { %>
+            <a
+              href="/?category=<%= category.slug %>"
+              class="<%= typeof currentCategory !== 'undefined' && currentCategory === category.slug ? 'active' : '' %>"
+            >
+              <%= category.name %>
+            </a>
+            <% }) %> <% } %>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <div class="container"><%- include('./_messages.ejs') %></div>
+
+    <main class="container"></main>
+  </body>
+</html>

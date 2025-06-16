@@ -1,0 +1,216 @@
+<%- include('partials/header') %>
+
+<div class="article-detail-container">
+  <article class="article-full">
+    <header class="article-header">
+      <h1 class="article-title-detail"><%= article.title %></h1>
+      <div class="article-meta">
+        <span class="meta-category"><%= article.category %></span>
+        <span class="meta-date"
+          >Dipublikasikan pada <%= new
+          Date(article.createdAt).toLocaleDateString('id-ID', { day: 'numeric',
+          month: 'long', year: 'numeric' }) %></span
+        >
+      </div>
+    </header>
+    <img
+      src="<%= article.imageUrl %>"
+      alt="<%= article.title %>"
+      class="article-image-detail"
+    />
+    <div class="article-content">
+      <%- article.content.replace(/\n/g, '<br />') %>
+    </div>
+  </article>
+
+  <section class="comment-section">
+    <h3>Diskusi</h3>
+
+    <% if (user) { %>
+    <div class="comment-form">
+      <form
+        id="main-comment-form"
+        action="/artikel/<%= article.slug %>/comments"
+        method="POST"
+      >
+        <div class="form-group">
+          <label for="comment-content">Tulis Komentar Baru</label>
+          <textarea
+            name="content"
+            id="comment-content"
+            rows="4"
+            required
+            placeholder="Bagikan pendapat Anda..."
+          ></textarea>
+        </div>
+        <button type="submit" class="btn">Kirim Komentar</button>
+      </form>
+    </div>
+    <% } else { %>
+    <p class="comment-login-prompt">
+      Silakan <a href="/login">login</a> untuk berkomentar atau membalas.
+    </p>
+    <% } %>
+
+    <div class="comment-list" id="comment-list">
+      <% if (comments.length > 0) { %> <% comments.forEach(function(comment) {
+      %> <%- include('partials/_comment', { comment: comment, article: article,
+      user: user }) %> <% }) %> <% } else { %>
+      <p id="no-comment-message">Belum ada komentar. Jadilah yang pertama!</p>
+      <% } %>
+    </div>
+  </section>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const commentList = document.getElementById("comment-list");
+    const mainCommentForm = document.getElementById("main-comment-form");
+
+    // --- FUNGSI UNTUK MENGIRIM KOMENTAR ---
+    const handleCommentSubmit = async (event) => {
+      event.preventDefault(); // Mencegah refresh halaman
+
+      const form = event.target;
+      const content = form.querySelector('textarea[name="content"]').value;
+      const parentId = form.querySelector('input[name="parentId"]')?.value; // Ambil parentId jika ada
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content, parentId }),
+        });
+
+        if (!response.ok) throw new Error("Gagal mengirim komentar");
+
+        const newComment = await response.json();
+
+        // Buat HTML untuk komentar baru
+        // Ini adalah cara sederhana, di aplikasi besar biasanya menggunakan template engine di client
+        const newCommentHtml = `
+                <div class="comment" id="comment-${newComment._id}">
+                    <div class="comment-author"><strong>${
+                      newComment.author.username
+                    }</strong></div>
+                    <div class="comment-content"><p>${
+                      newComment.content
+                    }</p></div>
+                    <div class="comment-meta">
+                        <div class="comment-date"><small>${new Date(
+                          newComment.createdAt
+                        ).toLocaleString("id-ID")}</small></div>
+                        <div class="comment-actions">
+                            <div class="like-container">
+                                <button type="button" class="btn-like" data-comment-id="${
+                                  newComment._id
+                                }">❤️ Suka</button>
+                                <span id="likes-count-${newComment._id}">${
+          newComment.likes.length
+        } Suka</span>
+                            </div>
+                            <button class="btn-reply" data-comment-id="${
+                              newComment._id
+                            }">Balas</button>
+                        </div>
+                    </div>
+                     <div class="reply-form" id="reply-form-${
+                       newComment._id
+                     }" style="display: none;">
+                        <form class="reply-comment-form" action="/artikel/<%= article.slug %>/comments" method="POST">
+                            <input type="hidden" name="parentId" value="${
+                              newComment._id
+                            }">
+                            <div class="form-group"><textarea name="content" rows="3" required></textarea></div>
+                            <button type="submit" class="btn btn-sm">Kirim Balasan</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+        if (parentId) {
+          // Jika ini balasan, tambahkan ke dalam div replies dari parent
+          const parentComment = document.getElementById("comment-" + parentId);
+          let repliesContainer =
+            parentComment.querySelector(".comment-replies");
+          if (!repliesContainer) {
+            repliesContainer = document.createElement("div");
+            repliesContainer.className = "comment-replies";
+            parentComment.appendChild(repliesContainer);
+          }
+          repliesContainer.insertAdjacentHTML("beforeend", newCommentHtml);
+          form.style.display = "none"; // Sembunyikan form balasan setelah submit
+        } else {
+          // Jika ini komentar utama, tambahkan ke daftar utama
+          commentList.insertAdjacentHTML("beforeend", newCommentHtml);
+          // Hapus pesan "Belum ada komentar" jika ada
+          const noCommentMsg = document.getElementById("no-comment-message");
+          if (noCommentMsg) noCommentMsg.remove();
+        }
+
+        form.reset(); // Kosongkan form
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    // --- FUNGSI UNTUK LIKE/UNLIKE ---
+    const handleLikeClick = async (event) => {
+      if (!event.target.classList.contains("btn-like")) return;
+
+      const button = event.target;
+      const commentId = button.dataset.commentId;
+
+      try {
+        const response = await fetch(`/comments/${commentId}/like`, {
+          method: "POST",
+        });
+        if (!response.ok) throw new Error("Gagal melakukan aksi");
+
+        const data = await response.json();
+
+        // Perbarui tampilan
+        const likesCountSpan = document.getElementById(
+          `likes-count-${commentId}`
+        );
+        likesCountSpan.textContent = `${data.likesCount} Suka`;
+        button.classList.toggle("liked", data.isLiked);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    // --- FUNGSI UNTUK TOGGLE FORM BALASAN ---
+    const handleReplyClick = (event) => {
+      if (!event.target.classList.contains("btn-reply")) return;
+
+      const commentId = event.target.dataset.commentId;
+      const replyForm = document.getElementById("reply-form-" + commentId);
+
+      if (replyForm) {
+        const isHidden =
+          replyForm.style.display === "none" || replyForm.style.display === "";
+        replyForm.style.display = isHidden ? "block" : "none";
+      }
+    };
+
+    // Pasang Event Listener
+    if (mainCommentForm) {
+      mainCommentForm.addEventListener("submit", handleCommentSubmit);
+    }
+
+    // Gunakan event delegation untuk semua aksi di dalam daftar komentar
+    commentList.addEventListener("click", (event) => {
+      handleLikeClick(event);
+      handleReplyClick(event);
+    });
+
+    commentList.addEventListener("submit", (event) => {
+      if (event.target.classList.contains("reply-comment-form")) {
+        handleCommentSubmit(event);
+      }
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

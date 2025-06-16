@@ -1,0 +1,66 @@
+<%- include('../partials/admin-header') %>
+
+<div class="admin-wrapper">
+  <%- include('../partials/admin-sidebar') %>
+
+  <div class="admin-main-content">
+    <div class="dashboard">
+      <h2>Kelola Kategori</h2>
+
+      <section class="form-section">
+        <h3>Tambah Kategori Baru</h3>
+        <form action="/admin/categories" method="POST">
+          <div class="form-group">
+            <label for="name">Nama Kategori</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              placeholder="Contoh: Teknologi"
+            />
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn">Tambah Kategori</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="table-section">
+        <h3>Daftar Kategori</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Kategori</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (categories.length > 0) { %> <% categories.forEach(category =>
+            { %>
+            <tr>
+              <td><%= category.name %></td>
+              <td class="action-buttons">
+                <form
+                  action="/admin/categories/delete/<%= category._id %>?_method=DELETE"
+                  method="POST"
+                >
+                  <button type="submit" class="btn btn-delete">Hapus</button>
+                </form>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="2" style="text-align: center">
+                Belum ada kategori.
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/admin-footer') %>

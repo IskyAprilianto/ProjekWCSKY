@@ -1,0 +1,66 @@
+<%- include('../partials/admin-header') %>
+
+<div class="admin-wrapper">
+  <%- include('../partials/admin-sidebar') %>
+
+  <div class="admin-main-content">
+    <div class="dashboard">
+      <h2>Kelola Komentar Pengguna</h2>
+      <div class="table-section">
+        <table>
+          <thead>
+            <tr>
+              <th>Komentar</th>
+              <th>Info</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (comments.length > 0) { %> <%
+            comments.forEach(function(comment) { %>
+            <tr class="comment-row">
+              <td class="comment-content-cell">
+                <div class="comment-text-bubble"><%= comment.content %></div>
+              </td>
+              <td class="comment-info-cell">
+                <div class="info-item">
+                  <strong>Penulis:</strong> <%= comment.author ?
+                  comment.author.username : 'N/A' %>
+                </div>
+                <div class="info-item">
+                  <strong>Artikel:</strong>
+                  <% if (comment.article) { %>
+                  <a href="/artikel/<%= comment.article.slug %>" target="_blank"
+                    ><%= comment.article.title %></a
+                  >
+                  <% } else { %> N/A <% } %>
+                </div>
+                <div class="info-item">
+                  <strong>Tanggal:</strong> <%= new
+                  Date(comment.createdAt).toLocaleDateString('id-ID') %>
+                </div>
+              </td>
+              <td class="action-buttons">
+                <form
+                  action="/admin/comments/delete/<%= comment._id %>?_method=DELETE"
+                  method="POST"
+                >
+                  <button type="submit" class="btn btn-delete">Hapus</button>
+                </form>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="3" style="text-align: center">
+                Tidak ada komentar.
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/admin-footer') %>
