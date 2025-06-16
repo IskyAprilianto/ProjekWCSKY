@@ -1,8 +1,6 @@
 const Article = require("../models/Article");
 const Category = require("../models/Category");
 const Comment = require("../models/Comment");
-const fs = require("fs");
-const path = require("path");
 
 // --- Fungsi Terkait Artikel ---
 
@@ -10,11 +8,13 @@ exports.getDashboard = async (req, res) => {
   try {
     const articles = await Article.find().sort({ createdAt: -1 });
     res.render("admin/dashboard", {
-      title: "Admin Dashboard",
+      title: "Daftar Artikel",
       articles,
     });
   } catch (err) {
     console.error(err);
+    req.flash("error_msg", "Gagal memuat daftar artikel.");
+    res.redirect("/admin/dashboard");
   }
 };
 
@@ -27,29 +27,34 @@ exports.getAddArticlePage = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    req.flash("error_msg", "Gagal memuat halaman.");
+    res.redirect("/admin/dashboard");
   }
 };
 
-exports.postAddArticle = (req, res) => {
-  const { title, content, category } = req.body;
-  if (!req.file) {
-    req.flash("error_msg", "Gambar sampul wajib di-upload.");
-    return res.redirect("/admin/articles/new");
-  }
-  const imageUrl = `/uploads/${req.file.filename}`;
-  const newArticle = new Article({ title, content, category, imageUrl });
+exports.postAddArticle = async (req, res) => {
+  try {
+    const { title, content, category } = req.body;
+    if (!req.file) {
+      req.flash("error_msg", "Gambar sampul wajib di-upload.");
+      return res.redirect("/admin/articles/new");
+    }
+    const imageUrl = req.file.path; // URL dari Cloudinary
+    const newArticle = new Article({ title, content, category, imageUrl });
+    await newArticle.save();
 
-  newArticle
-    .save()
-    .then(() => {
-      req.flash("success_msg", "Artikel baru berhasil ditambahkan!");
-      res.redirect("/admin/dashboard");
-    })
-    .catch((err) => {
-      console.error(err);
-      req.flash("error_msg", "Gagal menambahkan artikel.");
-      res.redirect("/admin/articles/new");
-    });
+    req.flash("success_msg", "Artikel baru berhasil ditambahkan!");
+    res.redirect("/admin/dashboard");
+  } catch (err) {
+    let errorMessage = "Gagal menambahkan artikel.";
+    if (err.code === 11000) {
+      errorMessage =
+        "Judul atau slug artikel sudah ada, silakan gunakan judul lain.";
+    }
+    console.error(err);
+    req.flash("error_msg", errorMessage);
+    res.redirect("/admin/articles/new");
+  }
 };
 
 exports.getEditArticle = async (req, res) => {
@@ -67,6 +72,7 @@ exports.getEditArticle = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    req.flash("error_msg", "Gagal memuat halaman edit.");
     res.redirect("/admin/dashboard");
   }
 };
@@ -77,10 +83,7 @@ exports.postEditArticle = async (req, res) => {
     let imageUrl = oldImageUrl;
 
     if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
-      fs.unlink(path.join(__dirname, "..", oldImageUrl), (err) => {
-        if (err) console.error("Gagal hapus gambar lama:", err);
-      });
+      imageUrl = req.file.path;
     }
     await Article.findByIdAndUpdate(req.params.id, {
       title,
@@ -100,12 +103,8 @@ exports.postEditArticle = async (req, res) => {
 
 exports.deleteArticle = async (req, res) => {
   try {
-    const article = await Article.findByIdAndDelete(req.params.id);
-    if (article && article.imageUrl) {
-      fs.unlink(path.join(__dirname, "..", article.imageUrl), (err) => {
-        if (err) console.error("Gagal hapus file gambar:", err);
-      });
-    }
+    await Article.findByIdAndDelete(req.params.id);
+
     req.flash("success_msg", "Artikel berhasil dihapus.");
     res.redirect("/admin/dashboard");
   } catch (err) {

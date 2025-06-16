@@ -2,10 +2,6 @@ const Article = require("../models/Article");
 const Category = require("../models/Category");
 const Comment = require("../models/Comment");
 
-/**
- * Menampilkan Halaman Utama (Homepage)
- * - Mengambil artikel dan membaginya menjadi 3 blok untuk tata letak unik.
- */
 exports.getHomepage = async (req, res) => {
   try {
     const categories = await Category.find().sort({ name: 1 });
@@ -20,10 +16,9 @@ exports.getHomepage = async (req, res) => {
 
     const allArticles = await Article.find(filter).sort({ createdAt: -1 });
 
-    // Membagi artikel menjadi 3 blok sesuai permintaan tata letak
-    const articlesBlock1 = allArticles.slice(0, 5); // Blok 1: 5 artikel pertama untuk grid
-    const articlesBlock2 = allArticles.slice(5, 10); // Blok 2: 5 artikel berikutnya untuk daftar
-    const articlesBlock3 = allArticles.slice(10); // Blok 3: Sisa artikel untuk grid lagi
+    const articlesBlock1 = allArticles.slice(0, 5);
+    const articlesBlock2 = allArticles.slice(5, 10);
+    const articlesBlock3 = allArticles.slice(10);
 
     res.render("index", {
       title: "SKY.com - Berita Terkini",
@@ -39,17 +34,10 @@ exports.getHomepage = async (req, res) => {
   }
 };
 
-/**
- * Menampilkan Halaman Detail Artikel
- * - Mengambil satu artikel berdasarkan slug.
- * - Mengambil semua komentar & balasannya secara berjenjang.
- */
 exports.getArticleBySlug = async (req, res) => {
   try {
     const article = await Article.findOne({ slug: req.params.slug });
-    if (!article) {
-      return res.status(404).send("Artikel tidak ditemukan");
-    }
+    if (!article) return res.status(404).send("Artikel tidak ditemukan");
 
     const categories = await Category.find().sort({ name: 1 });
 
@@ -82,10 +70,6 @@ exports.getArticleBySlug = async (req, res) => {
   }
 };
 
-/**
- * Menangani Fungsi Pencarian
- * - Mencari artikel berdasarkan query menggunakan text index.
- */
 exports.searchArticles = async (req, res) => {
   try {
     const query = req.query.q;

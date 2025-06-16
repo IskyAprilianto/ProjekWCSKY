@@ -3,12 +3,7 @@ const router = express.Router();
 const adminController = require("../controllers/adminController");
 const { isAdmin } = require("../middleware/authMiddleware");
 const multer = require("multer");
-
-// Konfigurasi Multer untuk upload gambar
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
+const { storage } = require("../config/cloudinary"); // Menggunakan storage dari Cloudinary
 const upload = multer({ storage });
 
 // Rute Artikel
@@ -19,7 +14,7 @@ router.post(
   isAdmin,
   upload.single("image"),
   adminController.postAddArticle
-);
+); // INI RUTE UNTUK SUBMIT
 router.get("/edit/:id", isAdmin, adminController.getEditArticle);
 router.put(
   "/edit/:id",
@@ -37,6 +32,7 @@ router.delete(
   isAdmin,
   adminController.deleteCategory
 );
+
 // Rute Komentar
 router.get("/comments", isAdmin, adminController.getManageCommentsPage);
 router.delete("/comments/delete/:id", isAdmin, adminController.deleteComment);
