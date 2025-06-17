@@ -46,11 +46,11 @@
 
         <nav class="user-nav">
           <% if (user) { %> <% if (user.role === 'admin') { %>
-          <a href="/admin/dashboard">Admin</a>
+          <a href="/admin/dashboard" class="btn">Admin</a>
           <% } %>
           <span class="welcome-user">Halo, <%= user.username %></span>
           <form action="/logout" method="POST" style="display: inline">
-            <button type="submit" class="btn-logout">Logout</button>
+            <button type="submit" class="btn btn-logout">Logout</button>
           </form>
           <% } else { %>
           <a href="/login" class="btn btn-dark">Login</a>

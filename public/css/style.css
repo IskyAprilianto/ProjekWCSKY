@@ -75,18 +75,21 @@ img {
   text-decoration: none;
   color: white;
 }
-.btn-sm {
-  font-size: 0.9rem;
+
+.btn.btn-dark {
+  color: #d2e8ff;
+  background: #007bff;
+  border: none;
   padding: 8px 15px;
-  width: auto;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: inherit;
 }
-.btn-dark {
-  background-color: #333;
+.btn.btn-dark:hover {
+  background-color: #0056b3;
+  text-decoration: none;
   color: white;
-  padding: 8px 16px;
-}
-.btn-dark:hover {
-  background-color: #1a1a1a;
 }
 .btn-edit {
   background-color: #fff;
