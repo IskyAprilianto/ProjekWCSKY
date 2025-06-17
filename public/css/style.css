@@ -131,6 +131,27 @@ img {
   font-family: inherit;
   font-size: 1rem;
 }
+/* ===============================
+                balasan
+/* ================================= */
+.reply-form-container {
+  margin-top: 15px;
+  padding-left: 20px;
+  border-left: 2px solid #e9ecef;
+}
+.reply-form-container .form-group {
+  margin-bottom: 10px;
+}
+.reply-form-actions {
+  display: flex;
+  gap: 10px;
+}
+.btn-cancel-reply {
+  background-color: #6c757d;
+}
+.btn-cancel-reply:hover {
+  background-color: #5a6268;
+}
 
 /* =================================
    3. Main Header & Navigation
@@ -215,7 +236,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .user-nav a,
 .user-nav .welcome-user {
   font-weight: 500;
-  color: #333;
+  color: #ffffff;
 }
 .btn-logout {
   background: #dc3545;

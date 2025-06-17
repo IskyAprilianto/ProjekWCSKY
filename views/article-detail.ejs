@@ -25,11 +25,17 @@
 
   <section class="comment-section">
     <h3>Diskusi</h3>
+
     <% if (user) { %>
-    <div class="comment-form">
-      <form action="/artikel/<%= article.slug %>/comments" method="POST">
+    <div class="comment-form" id="main-comment-form-container">
+      <form
+        id="main-comment-form"
+        action="/artikel/<%= article.slug %>/comments"
+        method="POST"
+      >
+        <input type="hidden" name="parentId" id="commentParentId" />
         <div class="form-group">
-          <label for="comment-content">Tulis Komentar Baru</label>
+          <label for="comment-content">Tulis Komentar</label>
           <textarea
             name="content"
             id="comment-content"
@@ -51,7 +57,7 @@
       <% if (comments.length > 0) { %> <% comments.forEach(function(comment) {
       %> <%- include('partials/_comment', { comment: comment, article: article,
       user: user, level: 0 }) %> <% }) %> <% } else { %>
-      <p>Belum ada komentar. Jadilah yang pertama!</p>
+      <p id="no-comment-message">Belum ada komentar. Jadilah yang pertama!</p>
       <% } %>
     </div>
   </section>
@@ -61,20 +67,107 @@
   document.addEventListener("DOMContentLoaded", function () {
     const commentList = document.getElementById("comment-list");
 
-    if (commentList) {
-      commentList.addEventListener("click", function (event) {
-        // Hanya jalankan jika yang diklik adalah tombol dengan kelas .btn-reply atau .btn-show-replies
-        if (event.target.matches(".btn-reply, .btn-show-replies")) {
-          event.preventDefault(); // Mencegah link '#' melompat ke atas
-          const targetId = event.target.dataset.target;
-          const targetElement = document.getElementById(targetId);
+    // Fungsi untuk membuat HTML form balasan
+    const createReplyFormHTML = (articleSlug, parentId, usernameToReply) => {
+      return `
+                <div class="reply-form-container">
+                    <form class="reply-comment-form" action="/artikel/${articleSlug}/comments" method="POST">
+                        <input type="hidden" name="parentId" value="${parentId}">
+                        <div class="form-group">
+                            <textarea name="content" rows="3" required placeholder="Balas @${usernameToReply}...">@${usernameToReply} </textarea>
+                        </div>
+                        <div class="reply-form-actions">
+                            <button type="submit" class="btn btn-sm">Kirim</button>
+                            <button type="button" class="btn-cancel-reply btn-sm">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+    };
 
-          if (targetElement) {
-            // Logika buka-tutup (toggle)
-            const isHidden =
-              targetElement.style.display === "none" ||
-              targetElement.style.display === "";
-            targetElement.style.display = isHidden ? "block" : "none";
+    if (commentList) {
+      commentList.addEventListener("click", async function (event) {
+        const target = event.target;
+
+        // --- LOGIKA TOMBOL SUKA (AJAX) ---
+        if (target.closest(".btn-like")) {
+          event.preventDefault();
+          const button = target.closest(".btn-like");
+          const commentId = button.dataset.commentId;
+
+          try {
+            const response = await fetch(`/comments/${commentId}/like`, {
+              method: "POST",
+            });
+            if (!response.ok) throw new Error("Aksi Suka gagal");
+
+            const data = await response.json();
+
+            const likesCountSpan = document.querySelector(
+              `#comment-${commentId} #likes-count-${commentId}`
+            );
+            if (likesCountSpan) {
+              likesCountSpan.textContent = data.likesCount;
+            }
+            button.classList.toggle("liked", data.isLiked);
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        }
+
+        // --- LOGIKA TOMBOL BALAS ---
+        if (target.matches(".btn-reply")) {
+          event.preventDefault();
+          const parentCommentElement = target.closest(".comment");
+
+          const existingForm = document.querySelector(".reply-form-container");
+          if (existingForm) {
+            existingForm.remove();
+          }
+
+          const parentId = parentCommentElement.dataset.commentId;
+          const usernameToReply = parentCommentElement.dataset.username;
+
+          const articleSlug = "<%= article.slug %>";
+          const replyFormHTML = createReplyFormHTML(
+            articleSlug,
+            parentId,
+            usernameToReply
+          );
+          parentCommentElement.insertAdjacentHTML("beforeend", replyFormHTML);
+
+          const newTextarea = parentCommentElement.querySelector(
+            ".reply-form-container textarea"
+          );
+          newTextarea.focus();
+          newTextarea.setSelectionRange(
+            newTextarea.value.length,
+            newTextarea.value.length
+          );
+        }
+
+        // --- LOGIKA TOMBOL BATAL ---
+        if (target.matches(".btn-cancel-reply")) {
+          event.preventDefault();
+          target.closest(".reply-form-container").remove();
+        }
+
+        // --- LOGIKA TOMBOL LIHAT BALASAN ---
+        if (target.matches(".btn-show-replies")) {
+          event.preventDefault();
+          const repliesContainer = document.getElementById(
+            target.dataset.target
+          );
+          if (repliesContainer) {
+            repliesContainer.style.display =
+              repliesContainer.style.display === "none" ||
+              repliesContainer.style.display === ""
+                ? "block"
+                : "none";
+            target.textContent =
+              repliesContainer.style.display === "none"
+                ? `Lihat ${target.dataset.count} balasan`
+                : "Sembunyikan balasan";
           }
         }
       });

@@ -6,7 +6,10 @@
     >
   </div>
   <div class="comment-content">
-    <p><%- comment.content.replace(/(@\w+)/g, '<strong>$1</strong>') %></p>
+    <p>
+      <%- comment.content ? comment.content.replace(/(@\w+)/g,
+      '<strong>$1</strong>') : '' %>
+    </p>
   </div>
   <div class="comment-meta">
     <div class="comment-date">
@@ -16,19 +19,25 @@
       >
     </div>
     <div class="comment-actions">
-      <form
-        action="/comments/<%= comment._id %>/like"
-        method="POST"
-        style="display: inline-flex; align-items: center"
-      >
+      <div class="like-container">
         <% let isLiked = false; if (user && comment.likes) { isLiked =
         comment.likes.some(function(likeId) { return likeId.equals(user._id);
         }); } %>
-        <button type="submit" class="btn-like <%= isLiked ? 'liked' : '' %>">
-          ❤️ <span>Suka</span>
-        </button>
-      </form>
-      <span><%= comment.likes.length %></span>
+        <form
+          action="/comments/<%= comment._id %>/like"
+          method="POST"
+          style="display: inline-flex; align-items: center"
+        >
+          <button
+            type="submit"
+            class="btn-like <%= isLiked ? 'liked' : '' %>"
+            data-comment-id="<%= comment._id %>"
+          >
+            ❤️ Suka
+          </button>
+        </form>
+        <span><%= comment.likes ? comment.likes.length : 0 %> Suka</span>
+      </div>
       <% if (user) { %>
       <a href="#" class="btn-reply" data-target="reply-form-<%= comment._id %>"
         >Balas</a
@@ -43,7 +52,11 @@
     id="reply-form-<%= comment._id %>"
     style="display: none"
   >
-    <form action="/artikel/<%= article.slug %>/comments" method="POST">
+    <form
+      class="reply-comment-form"
+      action="/artikel/<%= article.slug %>/comments"
+      method="POST"
+    >
       <input type="hidden" name="parentId" value="<%= comment._id %>" />
       <div class="form-group">
         <textarea

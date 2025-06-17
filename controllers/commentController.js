@@ -1,9 +1,6 @@
 const Comment = require("../models/Comment");
 const Article = require("../models/Article");
 
-/**
- * Memproses data dari form komentar baru atau balasan
- */
 exports.postComment = async (req, res) => {
   try {
     const article = await Article.findOne({ slug: req.params.slug });
@@ -14,23 +11,10 @@ exports.postComment = async (req, res) => {
 
     const { content, parentId } = req.body;
 
-    let finalContent = content;
-    let topLevelParentId = null;
-
-    // Logika untuk @tag dan menentukan induk utama dari sebuah balasan
-    if (parentId) {
-      const parentComment = await Comment.findById(parentId).populate(
-        "author",
-        "username"
-      );
-      if (parentComment) {
-        finalContent = `@${parentComment.author.username} ${content}`;
-        topLevelParentId = parentComment.parent || parentComment._id;
-      }
-    }
-
+    // Logika untuk menambahkan tag @username sudah dihapus.
+    // Sekarang kita langsung menggunakan 'content' dari form.
     const newComment = new Comment({
-      content: finalContent,
+      content: content,
       article: article._id,
       author: req.session.userId,
       parent: parentId || null,
@@ -38,14 +22,15 @@ exports.postComment = async (req, res) => {
 
     await newComment.save();
 
-    // Jika ini adalah balasan, tambahkan ID balasan ini ke komentar induk paling atas
-    if (topLevelParentId) {
+    if (parentId) {
+      // Logika untuk mengelompokkan balasan di bawah induk utama tetap ada
+      const parentComment = await Comment.findById(parentId);
+      const topLevelParentId = parentComment.parent || parentComment._id;
       await Comment.findByIdAndUpdate(topLevelParentId, {
         $push: { replies: newComment._id },
       });
     }
 
-    // Arahkan kembali ke artikel, scroll ke komentar yang baru dibuat
     res.redirect(`/artikel/${req.params.slug}#comment-${newComment._id}`);
   } catch (err) {
     console.error(err);
@@ -54,38 +39,31 @@ exports.postComment = async (req, res) => {
   }
 };
 
-/**
- * Menangani aksi like/unlike pada sebuah komentar
- */
 exports.toggleLikeComment = async (req, res) => {
   try {
-    const comment = await Comment.findById(req.params.id);
+    const commentId = req.params.id;
     const userId = req.session.userId;
+
+    const comment = await Comment.findById(commentId);
     if (!comment) {
       req.flash("error_msg", "Komentar tidak ditemukan.");
-      // Perlu redirect ke halaman sebelumnya, tapi kita tidak tahu pasti. Redirect ke home adalah pilihan aman.
-      return res.redirect("/");
+      return res.redirect("back");
     }
 
-    // Cek apakah user sudah ada di dalam array 'likes'
-    const hasLikedIndex = comment.likes.indexOf(userId);
+    const hasLiked = comment.likes.includes(userId);
 
-    if (hasLikedIndex > -1) {
-      // Jika ada, hapus (unlike)
-      comment.likes.splice(hasLikedIndex, 1);
+    if (hasLiked) {
+      await Comment.findByIdAndUpdate(commentId, { $pull: { likes: userId } });
     } else {
-      // Jika tidak ada, tambahkan (like)
-      comment.likes.push(userId);
+      await Comment.findByIdAndUpdate(commentId, {
+        $addToSet: { likes: userId },
+      });
     }
-    await comment.save();
 
-    const populatedComment = await comment.populate("article", "slug");
-    // Arahkan kembali ke artikel, scroll ke komentar yang di-like
-    res.redirect(
-      `/artikel/${populatedComment.article.slug}#comment-${req.params.id}`
-    );
+    res.redirect("back");
   } catch (err) {
     console.error(err);
-    res.redirect("/");
+    req.flash("error_msg", "Gagal melakukan aksi.");
+    res.redirect("back");
   }
 };
