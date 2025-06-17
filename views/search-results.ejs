@@ -4,14 +4,32 @@
   class="page-title"
   style="display: block; text-align: left; margin-top: 30px"
 >
-  <h1>Hasil Pencarian untuk: "<%= query %>"</h1>
+  <h1 style="margin-left: 40px">Hasil Pencarian untuk: "<%= query %>"</h1>
 </div>
 
-<div
-  class="article-grid"
-  style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))"
->
-  <% if (articles.length > 0) { %> <% articles.forEach(function(article) { %>
+<% if (articles.length === 1) { %>
+<div class="single-result-container">
+  <% const article = articles[0]; %>
+  <a href="/artikel/<%= article.slug %>" class="article-card featured-article">
+    <img
+      src="<%= article.imageUrl %>"
+      alt="<%= article.title %>"
+      class="card-img"
+    />
+    <div class="card-content">
+      <span class="card-category"><%= article.category %></span>
+      <h2 class="card-title"><%= article.title %></h2>
+      <p class="card-text"><%= article.content.substring(0, 150) %>...</p>
+      <small class="card-date"
+        ><%= new Date(article.createdAt).toLocaleDateString('id-ID', { day:
+        'numeric', month: 'long', year: 'numeric' }) %></small
+      >
+    </div>
+  </a>
+</div>
+<% } else if (articles.length > 1) { %>
+<div class="article-grid">
+  <% articles.forEach(function(article) { %>
   <a href="/artikel/<%= article.slug %>" class="article-card">
     <img
       src="<%= article.imageUrl %>"
@@ -28,19 +46,11 @@
       >
     </div>
   </a>
-  <% }) %> <% } else { %>
-  <p
-    style="
-      text-align: center;
-      grid-column: 1 / -1;
-      font-size: 1.2rem;
-      color: #555;
-      margin-top: 20px;
-    "
-  >
-    Tidak ada hasil yang ditemukan untuk pencarian "<%= query %>".
-  </p>
-  <% } %>
+  <% }) %>
 </div>
-
-<%- include('partials/footer') %>
+<% } else { %>
+<div class="no-results">
+  <p>Tidak ada hasil yang ditemukan untuk pencarian "<%= query %>".</p>
+  <a href="/" class="btn">Kembali ke Beranda</a>
+</div>
+<% } %> <%- include('partials/footer') %>

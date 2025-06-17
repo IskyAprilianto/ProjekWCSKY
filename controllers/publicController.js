@@ -5,7 +5,6 @@ const Comment = require("../models/Comment");
 exports.getHomepage = async (req, res) => {
   try {
     const categories = await Category.find().sort({ name: 1 });
-
     let filter = {};
     if (req.query.category) {
       const category = await Category.findOne({ slug: req.query.category });
@@ -13,13 +12,10 @@ exports.getHomepage = async (req, res) => {
         filter = { category: category.name };
       }
     }
-
     const allArticles = await Article.find(filter).sort({ createdAt: -1 });
-
     const articlesBlock1 = allArticles.slice(0, 5);
     const articlesBlock2 = allArticles.slice(5, 10);
     const articlesBlock3 = allArticles.slice(10);
-
     res.render("index", {
       title: "SKY.com - Berita Terkini",
       articlesBlock1,
@@ -47,14 +43,10 @@ exports.getArticleBySlug = async (req, res) => {
       .populate({
         path: "replies",
         options: { sort: { createdAt: 1 } },
-        populate: [
-          { path: "author", select: "username" },
-          {
-            path: "replies",
-            options: { sort: { createdAt: 1 } },
-            populate: { path: "author", select: "username" },
-          },
-        ],
+        populate: {
+          path: "author",
+          select: "username",
+        },
       });
 
     res.render("article-detail", {
@@ -74,7 +66,6 @@ exports.searchArticles = async (req, res) => {
   try {
     const query = req.query.q;
     const categories = await Category.find().sort({ name: 1 });
-
     let articles = [];
     if (query && query.trim() !== "") {
       articles = await Article.find(
@@ -82,7 +73,6 @@ exports.searchArticles = async (req, res) => {
         { score: { $meta: "textScore" } }
       ).sort({ score: { $meta: "textScore" } });
     }
-
     res.render("search-results", {
       title: `Hasil Pencarian untuk "${query}"`,
       query,

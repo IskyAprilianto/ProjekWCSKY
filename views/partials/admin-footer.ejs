@@ -1,6 +1,67 @@
-</main> <footer class="admin-footer">
+    </main>
+    
+    <footer class="admin-footer">
         <p>Copyright - 2025 Isky Dwi Aprilianto. All Rights Reserved.</p>
     </footer>
+
+    <a id="scrollToTopBtn" title="Kembali ke atas"><i class="fas fa-arrow-up"></i></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const adminSidebar = document.querySelector('.admin-sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            if (hamburgerBtn && adminSidebar && sidebarOverlay) {
+                // Fungsi untuk membuka sidebar
+                function openSidebar() {
+                    adminSidebar.classList.add('active');
+                    sidebarOverlay.classList.add('active');
+                }
+
+                // Fungsi untuk menutup sidebar
+                function closeSidebar() {
+                    adminSidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                }
+
+                // Event listener untuk tombol hamburger (buka/tutup)
+                hamburgerBtn.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    const isOpen = adminSidebar.classList.contains('active');
+                    if (isOpen) {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
+                    }
+                });
+                
+                // Event listener untuk overlay (klik di luar sidebar)
+                sidebarOverlay.addEventListener('click', closeSidebar);
+            }
+            
+
+            // --- Logika untuk Tombol Scroll to Top ---
+            const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+            if (scrollToTopBtn) {
+                let lastScrollTop = 0;
+                window.addEventListener("scroll", function() {
+                    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    if (scrollTop < lastScrollTop && scrollTop > 300) {
+                        scrollToTopBtn.classList.add('show');
+                    } else {
+                        scrollToTopBtn.classList.remove('show');
+                    }
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+                }, false);
+
+                scrollToTopBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

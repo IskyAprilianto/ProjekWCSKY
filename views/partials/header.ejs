@@ -13,7 +13,9 @@
   <body>
     <header class="main-header">
       <div class="container header-top">
-        <a href="/" class="logo">SKY.com</a>
+        <a href="/" class="logo">
+          <img src="/images/skynews.svg" alt="SKY.com Logo" />
+        </a>
 
         <form action="/search" method="GET" class="search-form">
           <input
@@ -51,7 +53,7 @@
             <button type="submit" class="btn-logout">Logout</button>
           </form>
           <% } else { %>
-          <a href="/login">Login</a>
+          <a href="/login" class="btn btn-dark">Login</a>
           <% } %>
         </nav>
       </div>

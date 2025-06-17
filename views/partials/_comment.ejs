@@ -1,19 +1,80 @@
-<% if (user) { %>
-<div class="like-container">
-  <button
-    type="button"
-    class="btn-like <%= comment.likes.includes(user.id) ? 'liked' : '' %>"
-    data-comment-id="<%= comment._id %>"
+<div class="comment" id="comment-<%= comment._id %>">
+  <div class="comment-author">
+    <strong
+      ><%= comment.author ? comment.author.username : 'Pengguna Dihapus'
+      %></strong
+    >
+  </div>
+  <div class="comment-content">
+    <p><%- comment.content.replace(/(@\w+)/g, '<strong>$1</strong>') %></p>
+  </div>
+  <div class="comment-meta">
+    <div class="comment-date">
+      <small
+        ><%= new Date(comment.createdAt).toLocaleString('id-ID', { dateStyle:
+        'medium', timeStyle: 'short'}) %></small
+      >
+    </div>
+    <div class="comment-actions">
+      <form
+        action="/comments/<%= comment._id %>/like"
+        method="POST"
+        style="display: inline-flex; align-items: center"
+      >
+        <% let isLiked = false; if (user && comment.likes) { isLiked =
+        comment.likes.some(function(likeId) { return likeId.equals(user._id);
+        }); } %>
+        <button type="submit" class="btn-like <%= isLiked ? 'liked' : '' %>">
+          ❤️ <span>Suka</span>
+        </button>
+      </form>
+      <span><%= comment.likes.length %></span>
+      <% if (user) { %>
+      <a href="#" class="btn-reply" data-target="reply-form-<%= comment._id %>"
+        >Balas</a
+      >
+      <% } %>
+    </div>
+  </div>
+
+  <% if (user) { %>
+  <div
+    class="reply-form"
+    id="reply-form-<%= comment._id %>"
+    style="display: none"
   >
-    ❤️ Suka
-  </button>
-  <span id="likes-count-<%= comment._id %>"
-    ><%= comment.likes.length %> Suka</span
+    <form action="/artikel/<%= article.slug %>/comments" method="POST">
+      <input type="hidden" name="parentId" value="<%= comment._id %>" />
+      <div class="form-group">
+        <textarea
+          name="content"
+          rows="3"
+          required
+          placeholder="Tulis balasan Anda..."
+        ></textarea>
+      </div>
+      <button type="submit" class="btn btn-sm">Kirim Balasan</button>
+    </form>
+  </div>
+  <% } %> <% if (comment.replies && comment.replies.length > 0) { %>
+  <div class="replies-toggle">
+    <a
+      href="#"
+      class="btn-show-replies"
+      data-target="replies-container-<%= comment._id %>"
+    >
+      Lihat <%= comment.replies.length %> balasan
+    </a>
+  </div>
+
+  <div
+    class="comment-replies"
+    id="replies-container-<%= comment._id %>"
+    style="display: none"
   >
+    <% comment.replies.forEach(function(reply) { %> <%- include('_comment', {
+    comment: reply, article: article, user: user, level: (level + 1) }) %> <% })
+    %>
+  </div>
+  <% } %>
 </div>
-<button class="btn-reply" data-comment-id="<%= comment._id %>">Balas</button>
-<% } else { %>
-<div class="like-container">
-  <span>❤️ <%= comment.likes.length %> Suka</span>
-</div>
-<% } %>

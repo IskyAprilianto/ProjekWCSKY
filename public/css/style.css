@@ -12,9 +12,8 @@ body {
   color: #333;
 }
 body.admin-page-body {
-  background-color: #fff; /* Latar belakang body diubah jadi putih */
+  background-color: #f0f2f5;
 }
-
 a {
   text-decoration: none;
   color: #007bff;
@@ -34,6 +33,25 @@ img {
   margin: 0 auto;
   padding: 0 24px;
   box-sizing: border-box;
+}
+/* Gaya untuk hasil pencarian tunggal */
+.single-result-container {
+  display: flex;
+  justify-content: left; /* Membuat kartu berada di tengah */
+  padding: 0 24px;
+}
+
+.single-result-container .article-card {
+  width: 100%;
+  max-width: 350px; /* Batasi lebar maksimum kartu agar tidak gepeng */
+}
+/* Pastikan ada di dalam /* 5. Main Content & Layout */
+.article-grid {
+  display: grid;
+  /* auto-fit akan secara otomatis mengatur jumlah kolom berdasarkan lebar layar */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 0 24px;
 }
 
 /* =================================
@@ -61,6 +79,30 @@ img {
   font-size: 0.9rem;
   padding: 8px 15px;
   width: auto;
+}
+.btn-dark {
+  background-color: #333;
+  color: white;
+  padding: 8px 16px;
+}
+.btn-dark:hover {
+  background-color: #1a1a1a;
+}
+.btn-edit {
+  background-color: #fff;
+  color: #ffc107;
+  border: 1px solid #ffc107;
+  font-weight: bold;
+}
+.btn-edit:hover {
+  background-color: #ffc107;
+  color: #fff;
+}
+.btn-delete {
+  background-color: #dc3545;
+}
+.btn-delete:hover {
+  background-color: #c82333;
 }
 .form-group {
   margin-bottom: 1.5rem;
@@ -93,24 +135,36 @@ img {
 .main-header {
   background: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  padding: 0;
   position: sticky;
   top: 0;
   z-index: 1000;
+}
+.main-header .logo img,
+.admin-header .logo img {
+  height: 100px; /* Atur tinggi logo sesuai keinginan Anda */
+  width: auto; /* Lebar akan menyesuaikan secara otomatis */
+  display: block;
 }
 .header-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 15px 0;
 }
-.main-header .logo {
-  font-size: 2.5rem;
+.main-header .logo,
+.admin-header .logo {
   font-weight: 900;
   letter-spacing: -2px;
   color: #111;
+  text-decoration: none;
 }
+.main-header .logo {
+  font-size: 2.5rem;
+}
+.admin-header .logo {
+  font-size: 1.8rem;
+}
+
 .search-form {
   flex-grow: 1;
   margin: 0 40px;
@@ -172,6 +226,7 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 .header-bottom {
   border-top: 1px solid #eee;
+  background: #fff;
 }
 .category-nav {
   display: flex;
@@ -247,12 +302,12 @@ input[type="search"]::-webkit-search-cancel-button {
    5. Main Content & Layout
    ================================= */
 main {
-  padding-top: 30px;
-  padding-bottom: 60px;
+  padding: 0;
   flex-grow: 1;
 }
 .featured-title,
 .section-title {
+  padding: 0 24px;
   margin-bottom: 20px;
 }
 .featured-title {
@@ -264,28 +319,27 @@ main {
   font-weight: 700;
   color: #007bff;
   margin: 0;
-  margin-left: 40px;
 }
 .article-grid {
   display: grid;
   gap: 24px;
+  padding: 0 24px;
 }
 .featured-grid,
 .older-grid {
   grid-template-columns: repeat(5, 1fr);
-  margin-left: 20px;
-  margin-right: 20px;
 }
 .article-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding: 0 24px;
 }
 .section-divider {
   border: 0;
   height: 1px;
   background-color: #ddd;
-  margin: 40px 0;
+  margin: 40px 24px;
 }
 
 /* =================================
@@ -362,7 +416,7 @@ main {
 .list-card-image {
   flex-shrink: 0;
   width: 500px;
-  height: 280px;
+  height: 300px;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -393,14 +447,14 @@ main {
 /* =================================
    7. Admin Layout & Dashboard
    ================================= */
+/* Admin Header */
 .admin-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
   background-color: #fff;
   border-bottom: 1px solid #eee;
   padding: 15px 0;
-  margin-right: 100px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 .admin-header .container {
   display: flex;
@@ -409,9 +463,9 @@ main {
 }
 .admin-header .logo {
   font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: normal;
+  font-weight: 600;
   color: #333;
+  text-decoration: none;
 }
 .admin-header-nav {
   display: flex;
@@ -422,31 +476,39 @@ main {
   font-weight: 500;
   color: #555;
 }
-.admin-header-nav .nav-link:hover {
-  color: #007bff;
-}
 .admin-user-info {
   background-color: #f0f2f5;
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 0.9rem;
 }
+.hamburger-btn {
+  display: none;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  z-index: 2001;
+}
+
+/* Admin Wrapper */
 .admin-wrapper {
   display: flex;
   gap: 30px;
   align-items: flex-start;
+  padding: 30px 24px;
 }
+
+/* Admin Sidebar */
 .admin-sidebar {
   flex: 0 0 250px;
-  background-color: #f8f9fa;
+  background-color: #fff;
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid #eee;
-  position: sticky;
-  top: 10px;
-  padding-top: 50px;
-  padding-right: 10px;
-  padding-bottom: 500px;
+  transition: transform 0.3s ease-in-out;
 }
 .sidebar-header h3 {
   margin: 0 0 20px 0;
@@ -465,13 +527,16 @@ main {
   font-weight: 500;
   border-radius: 6px;
   margin-bottom: 5px;
-  transition: background-color 0.2s;
+  text-decoration: none;
 }
 .sidebar-nav li a:hover {
-  background-color: #e9ecef;
+  background-color: #f0f2f5;
 }
+
+/* Admin Main Content */
 .admin-main-content {
   flex-grow: 1;
+  min-width: 0;
 }
 .dashboard {
   background: #fff;
@@ -480,10 +545,9 @@ main {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 .dashboard h2 {
-  margin-top: 0;
+  margin: 0 0 30px 0;
   padding-bottom: 15px;
   border-bottom: 2px solid #eee;
-  margin-bottom: 30px;
 }
 .table-section {
   width: 100%;
@@ -509,58 +573,43 @@ th {
   display: flex;
   gap: 10px;
 }
-.btn-edit,
-.btn-delete {
-  width: auto;
-  font-size: 0.9rem;
-  padding: 8px 12px;
-  font-weight: 500;
+
+/* Overlay for Mobile Sidebar */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
 }
-.btn-edit {
-  background-color: #ffc107;
-}
-.btn-edit:hover {
-  background-color: #e0a800;
-}
-.btn-delete {
-  background-color: #dc3545;
-}
-.btn-delete:hover {
-  background-color: #c82333;
-}
-.comment-content-cell {
-  white-space: normal;
-  word-break: break-word;
-  max-width: 400px;
-  vertical-align: top;
-}
-.info-item {
-  margin-bottom: 8px;
-}
-.info-item strong {
-  color: #555;
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* =================================
    8. Footer & Copyright
    ================================= */
-.main-footer-container,
-.admin-footer {
-  padding: 20px;
-  text-align: center;
-  color: #777;
-  font-size: 0.9rem;
-  margin-top: 20px;
-}
 .main-footer-container {
   background-color: #fff;
+  padding: 40px 0 20px 0;
   border-top: 1px solid #ddd;
+  margin-top: 20px;
 }
 .admin-footer {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   margin-top: 30px;
+  padding: 20px;
+  text-align: center;
+  color: #777;
+  font-size: 0.9rem;
 }
 .footer-content {
   display: flex;
@@ -594,9 +643,10 @@ th {
   transform: scale(1.1);
 }
 .copyright {
-  margin-top: 30px;
+  text-align: center; /* KUNCI UTAMANYA DI SINI */
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  color: #777;
+  font-size: 0.9rem;
 }
 
 /* =================================
@@ -690,6 +740,18 @@ th {
 .comment-content p {
   margin: 0;
   line-height: 1.6;
+}
+.comment-content-cell {
+  white-space: normal;
+  word-break: break-word;
+  max-width: 400px;
+  vertical-align: top;
+}
+.info-item {
+  margin-bottom: 8px;
+}
+.info-item strong {
+  color: #555;
 }
 .comment-date small {
   color: #777;
@@ -835,6 +897,34 @@ th {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
+
+@media (max-width: 992px) {
+  .admin-header .logo {
+    margin-right: auto;
+  }
+  .hamburger-btn {
+    display: block;
+    order: -1;
+    margin-right: 15px;
+  }
+  .admin-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    z-index: 2000;
+    border-radius: 0;
+    border-right: 1px solid #ddd;
+  }
+  .admin-sidebar.active {
+    transform: translateX(0);
+  }
+  .admin-wrapper {
+    padding-top: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .list-article-card {
     flex-direction: column;
@@ -858,10 +948,50 @@ th {
   }
   .admin-wrapper {
     flex-direction: column;
+    padding-top: 20px;
   }
   .admin-sidebar {
     position: static;
     width: 100%;
     box-sizing: border-box;
+  }
+  .footer-content {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .footer-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-header .logo {
+    font-size: 2rem;
+  }
+  .search-form input[type="search"] {
+    padding: 10px 40px 10px 15px;
+    font-size: 0.9rem;
+  }
+  .btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+  .admin-header .logo {
+    font-size: 1.3rem;
+  }
+  .admin-header-nav {
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+  .btn-logout {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+  }
+  .dashboard {
+    padding: 15px;
+  }
+  .article-title-detail {
+    font-size: 2rem;
   }
 }

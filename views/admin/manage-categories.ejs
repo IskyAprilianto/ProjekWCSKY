@@ -36,8 +36,8 @@
             </tr>
           </thead>
           <tbody>
-            <% if (categories.length > 0) { %> <% categories.forEach(category =>
-            { %>
+            <% if (categories.length > 0) { %> <%
+            categories.forEach(function(category) { %>
             <tr>
               <td><%= category.name %></td>
               <td class="action-buttons">
