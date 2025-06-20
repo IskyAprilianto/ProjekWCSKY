@@ -2,7 +2,7 @@
 
 Selamat datang di SKYnews, sebuah aplikasi web portal berita full-stack yang dibangun dengan Node.js, Express, dan MongoDB. Aplikasi ini dirancang untuk menjadi platform berita yang dinamis, interaktif, dan mudah dikelola.
 
-![Tampilan Homepage SKYnews](image_3a3fa5.jpg)
+![Tampilan Homepage SKYnews](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXR5c28wbnRpaHc0eHV6M3A5eG0zaHU2aGgwMWVyeWZpZm15NGFhayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KeL8xwBgPVvCmTX6qz/giphy.gif)
 
 ## Fitur Utama
 
